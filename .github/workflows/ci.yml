@@ -29,4 +29,4 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake ../test/project/${{ matrix.project }}
+        cmake ../test/projects/${{ matrix.project }}
