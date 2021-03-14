@@ -1,0 +1,32 @@
+name: kernel-test
+
+on:
+  # We run CI on pushes to the main branch
+  push:
+    branches:
+      - main
+  # as well as one pushes to PRs targeting the main branch
+  pull_request:
+    branches:
+      - main
+  # as well as upon manual triggers through the 'Actions' tab of the Github UI
+  workflow_dispatch:
+
+jobs:
+  kernel-test:
+    name: Testing Kernel Configuration
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - adder
+
+    steps:
+    - name: Checking out xeus-cling-cmake-setup repository
+      uses: actions/checkout@v2
+
+    - name: Building the CMake project to test
+      run: |
+        mkdir build
+        cd build
+        cmake ../test/project/${{ matrix.project }}
