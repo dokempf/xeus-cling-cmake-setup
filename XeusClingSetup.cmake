@@ -182,20 +182,21 @@ function(xeus_cling_setup)
   file(
     GENERATE
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/kernel.json
-    CONTENT [[
+    CONTENT
+    "
       {
-        "display_name": "${XEUSCLING_KERNEL_NAME}",
-        "argv": [
-          "${XCPP_BIN}",
-          "-f",
-          "{connection_file}",
-          "-std=c++${XEUSCLING_CXX_STANDARD}",
-          "-include",
-          "${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh"
+        \"display_name\": \"${XEUSCLING_KERNEL_NAME}\",
+        \"argv\": [
+          \"${XCPP_BIN}\",
+          \"-f\",
+          \"{connection_file}\",
+          \"-std=c++${XEUSCLING_CXX_STANDARD}\",
+          \"-include\",
+          \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
         ],
-        "language": "C++${XEUSCLING_CXX_STANDARD}"
+        \"language\": \"C++${XEUSCLING_CXX_STANDARD}\"
       }
-    ]]
+    "
   )
 
   # Create a kernel name to identify the kernel in jupyter.
