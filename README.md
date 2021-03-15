@@ -14,7 +14,7 @@ is not ideal for several reasons:
 This project goes an alternative route of solving the problem to set up xeus-cling with external dependencies:
 Assuming that you are using CMake to build your project anyway, it provides a CMake extension
 that generates a xeus-cling kernel configuration into the build directory. This configuration can
-either be installed into your jupyter environment manually or as part of CMake installation.
+be installed into your jupyter environment.
 
 ## Prerequisites
 
@@ -53,10 +53,8 @@ xeus_cling_setup(
 It is recommended to work with CMake targets only, but include directories and libraries can also
 be specified manually (see below for the full signature of `xeus_cling_setup`).
 
-A `kernel.json` file will be generated into your build directory. If you perform installation
-of your project in CMake, this kernel specification will be automatically installed into your
-jupyter environment as part of the installation. If you do not want to perform installation,
-you can also manually install the kernel specification by building the CMake target `install_kernelspec`.
+A `kernel.json` file will be generated into your build directory. You can also manually install
+this kernel specification by building the CMake target `install_kernelspec`.
 
 ## Documentation
 
@@ -69,7 +67,6 @@ xeus_cling_setup(
   [LINK_LIBRARIES lib1 [lib2 ...]]
   [KERNEL_NAME name]
   [CXX_STANDARD 11|14|17]
-  [NO_INSTALL]
   [REQUIRED]
 )
 ```

@@ -43,10 +43,6 @@
 # REQUIRED
 #     Set this if you want to error out if xeus-cling was not found on the system.
 #
-# NO_INSTALL
-#     Set this to prevent automatic installation of the kernelspec during installation
-#     of the project.
-#
 # This file is licensed under the MIT License:
 #
 # Copyright 2021 Dominic Kempf, Heidelberg University
@@ -186,19 +182,20 @@ function(xeus_cling_setup)
   file(
     GENERATE
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/kernel.json
-    CONTENT
-      "{
-        \"display_name\": \"${XEUSCLING_KERNEL_NAME}\",
-        \"argv\": [
-          \"${XCPP_BIN}\",
-          \"-f\",
-          \"{connection_file}\",
-          \"-std=c++${XEUSCLING_CXX_STANDARD}\",
-          \"-include\",
-          \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
+    CONTENT [[
+      {
+        "display_name": "${XEUSCLING_KERNEL_NAME}",
+        "argv": [
+          "${XCPP_BIN}",
+          "-f",
+          "{connection_file}",
+          "-std=c++${XEUSCLING_CXX_STANDARD}",
+          "-include",
+          "${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh"
         ],
-        \"language\": \"C++${XEUSCLING_CXX_STANDARD}\"
-      }"
+        "language": "C++${XEUSCLING_CXX_STANDARD}"
+      }
+    ]]
   )
 
   # Create a kernel name to identify the kernel in jupyter.
@@ -222,13 +219,4 @@ function(xeus_cling_setup)
       COMMENT "The jupyter executable was not found by CMake, not install kernel spec"
     )
   endif()
-
-  if(NOT XEUSCLING_NO_INSTALL)
-    install(CODE "
-      execute_process(
-        COMMAND ${CMAKE_COMMAND} --build . --target install_kernelspec
-      )
-    ")
-  endif()
-
 endfunction()
