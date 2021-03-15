@@ -28,8 +28,6 @@ jobs:
 
     - name: Setting up Anaconda
       uses: s-weigand/setup-conda@v1
-      with:
-        channels: 'conda-forge'
 
     - name: Install test prerequisites
       run: |
@@ -37,7 +35,7 @@ jobs:
 
     - name: Install xeus-cling
       run: |
-        conda install xeus-cling
+        conda install xeus-cling jupyter -c conda-forge
 
     - name: Building the kernels and manually installing them
       if: matrix.installation == 'without'
