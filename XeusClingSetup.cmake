@@ -7,6 +7,7 @@
 #   [TARGETS target1 [target2 ...]]
 #   [INCLUDE_DIRECTORIES inc1 [inc2 ...]]
 #   [LINK_LIBRARIES lib1 [lib2 ...]]
+#   [COMPILE_FLAGS flag1 [flag2 ...]]
 #   [KERNEL_NAME name]
 #   [CXX_STANDARD 11|14|17]
 #   [REQUIRED]
@@ -32,6 +33,9 @@
 # LINK_LIBRARIES
 #     A list of shared library locations that should be loaded in the xeus-cling session.
 #     May include generator expressions
+#
+# COMPILE_FLAGS
+#     A list of compiler flags to add to the interpreter session.
 #
 # KERNEL_NAME
 #     The display name of the Jupyter Kernel that is to be generated. Defaults to
@@ -73,7 +77,7 @@ function(xeus_cling_setup)
   # Parse Function Arguments
   set(OPTION REQUIRED NO_INSTALL)
   set(SINGLE CXX_STANDARD KERNEL_NAME)
-  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES)
+  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_FLAGS)
   include(CMakeParseArguments)
   cmake_parse_arguments(XEUSCLING "${OPTION}" "${SINGLE}" "${MULTI}" ${ARGN})
   if(XEUSCLING_UNPARSED_ARGUMENTS)
@@ -178,6 +182,12 @@ function(xeus_cling_setup)
     CONTENT ${xeus_pragma_header}
   )
 
+  # Create a string from the given compiler options
+  set(cxxopts_string "")
+  foreach(flag ${XEUSCLING_COMPILE_FLAGS})
+    set(cxxopts_string "${cxxopts_string}\"${flag}\",")
+  endforeach()
+
   # Generate the kernel.json file
   file(
     GENERATE
@@ -191,6 +201,7 @@ function(xeus_cling_setup)
           \"-f\",
           \"{connection_file}\",
           \"-std=c++${XEUSCLING_CXX_STANDARD}\",
+          ${cxxopts_string}
           \"-include\",
           \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
         ],

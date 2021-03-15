@@ -53,18 +53,20 @@ xeus_cling_setup(
 It is recommended to work with CMake targets only, but include directories and libraries can also
 be specified manually (see below for the full signature of `xeus_cling_setup`).
 
-A `kernel.json` file will be generated into your build directory. You can also manually install
-this kernel specification by building the CMake target `install_kernelspec`.
+A `kernel.json` file will be generated into your build directory. You can install
+this kernel specification by building the CMake target `install_kernelspec` or you
+can manually do so using the `jupyter kernelspec install` command.
 
 ## Documentation
 
-Th CMake function `xeus_cling_setup` allows for many more parameters than shown in above minimal example:
+The CMake function `xeus_cling_setup` allows for many more parameters than shown in above minimal example:
 
 ```
 xeus_cling_setup(
   [TARGETS target1 [target2 ...]]
   [INCLUDE_DIRECTORIES inc1 [inc2 ...]]
   [LINK_LIBRARIES lib1 [lib2 ...]]
+  [COMPILE_FLAGS flag1 [flag2 ...]]
   [KERNEL_NAME name]
   [CXX_STANDARD 11|14|17]
   [REQUIRED]
