@@ -43,6 +43,9 @@
 # REQUIRED
 #     Set this if you want to error out if xeus-cling was not found on the system.
 #
+# NO_INSTALL
+#     Set this to prevent automatic installation of the kernelspec during installation
+#     of the project.
 #
 # This file is licensed under the MIT License:
 #
@@ -72,7 +75,7 @@ function(xeus_cling_setup)
   #
 
   # Parse Function Arguments
-  set(OPTION REQUIRED)
+  set(OPTION REQUIRED NO_INSTALL)
   set(SINGLE CXX_STANDARD KERNEL_NAME)
   set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES)
   include(CMakeParseArguments)
@@ -86,6 +89,9 @@ function(xeus_cling_setup)
   # If you built xeus-cling from source, you can set CMAKE_PREFIX_PATH to
   # give CMake hints about where to find it.
   find_program(XCPP_BIN xcpp)
+
+  # We also search for the jupyter executable to be able to install the kernel spec
+  find_program(JUPYTER_BIN jupyter)
 
   # Apply the REQUIRED argument
   if(NOT XCPP_BIN)
@@ -172,7 +178,7 @@ function(xeus_cling_setup)
   # Generate the header file
   file(
     GENERATE
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh"
     CONTENT ${xeus_pragma_header}
   )
 
@@ -189,9 +195,40 @@ function(xeus_cling_setup)
           \"{connection_file}\",
           \"-std=c++${XEUSCLING_CXX_STANDARD}\",
           \"-include\",
-          \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
+          \"xeus_cling.hh\"
         ],
         \"language\": \"C++${XEUSCLING_CXX_STANDARD}\"
       }"
   )
+
+  # Create a kernel name to identify the kernel in jupyter.
+  string(
+    UUID kernel_name
+    NAMESPACE 00000000-0000-0000-0000-000000000000
+    NAME "${XEUSCLING_KERNEL_NAME}"
+    TYPE SHA1
+  )
+
+  # Add a target that triggers the installation of the kernel spec
+  if(JUPYTER_BIN)
+    add_custom_target(
+      install_kernelspec
+      COMMAND ${JUPYTER_BIN} kernelspec install ${CMAKE_CURRENT_BINARY_DIR} --sys-prefix --name=${kernel_name}
+      COMMENT "Install kernelspec into the jupyter environment..."
+    )
+  else()
+    add_custom_target(
+      install_kernelspec
+      COMMENT "The jupyter executable was not found by CMake, not install kernel spec"
+    )
+  endif()
+
+  if(NOT XEUSCLING_NO_INSTALL)
+    install(CODE "
+      execute_process(
+        COMMAND ${CMAKE_COMMAND} --build . --target install_kernelspec
+      )
+    ")
+  endif()
+
 endfunction()

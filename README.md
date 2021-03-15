@@ -53,7 +53,10 @@ xeus_cling_setup(
 It is recommended to work with CMake targets only, but include directories and libraries can also
 be specified manually (see below for the full signature of `xeus_cling_setup`).
 
-TODO: Describe `jupyter kernelspec install`
+A `kernel.json` file will be generated into your build directory. If you perform installation
+of your project in CMake, this kernel specification will be automatically installed into your
+jupyter environment as part of the installation. If you do not want to perform installation,
+you can also manually install the kernel specification by building the CMake target `install_kernelspec`.
 
 ## Documentation
 
@@ -66,6 +69,7 @@ xeus_cling_setup(
   [LINK_LIBRARIES lib1 [lib2 ...]]
   [KERNEL_NAME name]
   [CXX_STANDARD 11|14|17]
+  [NO_INSTALL]
   [REQUIRED]
 )
 ```

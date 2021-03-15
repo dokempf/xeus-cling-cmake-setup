@@ -3,8 +3,6 @@ Roadmap:
 * Add `jupyter kernelspec install` paragraph to README
 * Make installation of generated headers etc. work
 * Doxygen integration
-* Github Actions with meaningful tests
-* Testing setup with pytest + nbval
 
 Reading list:
 
