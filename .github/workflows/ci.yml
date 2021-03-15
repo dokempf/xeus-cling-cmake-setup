@@ -30,7 +30,7 @@ jobs:
       uses: s-weigand/setup-conda@v1
       channels: 'conda-forge'
 
-    - name : Install test prerequisites
+    - name: Install test prerequisites
       run: |
         python -m pip install -r ./test/requirements.txt
 
@@ -38,14 +38,14 @@ jobs:
       run: |
         conda install xeus-cling
 
-    - name: Building the kernels and manually install them
-      if: "${{ matrix.installation }}" == "without"
+    - name: Building the kernels and manually installing them
+      if: matrix.installation == 'without'
       run: |
         cd test
         ./install_all_kernels.sh
 
     - name: Building the kernels and installing them with CMake
-      if: "${{ matrix.installation }}" == "with"
+      if: matrix.installation == 'with'
       run: |
         cd test
         ./install_all_kernels.sh install
