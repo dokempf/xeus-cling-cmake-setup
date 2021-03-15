@@ -14,13 +14,8 @@ on:
 
 jobs:
   kernel-test:
-    name: Testing Kernel Configuration ${{ matrix.installation }} installation
+    name: Testing Kernel Configurations
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        installation:
-          #- "with"
-          - "without"
 
     steps:
     - name: Checking out xeus-cling-cmake-setup repository
@@ -38,16 +33,9 @@ jobs:
         conda install xeus-cling jupyter -c conda-forge
 
     - name: Building the kernels and manually installing them
-      if: matrix.installation == 'without'
       run: |
         cd test
         ./install_all_kernels.sh
-
-    - name: Building the kernels and installing them with CMake
-      if: matrix.installation == 'with'
-      run: |
-        cd test
-        ./install_all_kernels.sh install
 
     - name: Run Pytest to check that all Jupyter notebooks can be reproduced
       run: |
