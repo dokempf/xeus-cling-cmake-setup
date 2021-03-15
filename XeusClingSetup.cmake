@@ -228,7 +228,7 @@ function(xeus_cling_setup)
   else()
     add_custom_target(
       install_kernelspec
-      COMMENT "The jupyter executable was not found by CMake, not install kernel spec"
+      COMMENT "The jupyter executable was not found by CMake, not installing kernel spec"
     )
   endif()
 endfunction()
