@@ -28,7 +28,8 @@ jobs:
 
     - name: Setting up Anaconda
       uses: s-weigand/setup-conda@v1
-      channels: 'conda-forge'
+      with:
+        channels: 'conda-forge'
 
     - name: Install test prerequisites
       run: |
