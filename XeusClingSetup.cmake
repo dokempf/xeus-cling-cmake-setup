@@ -195,7 +195,7 @@ function(xeus_cling_setup)
           \"{connection_file}\",
           \"-std=c++${XEUSCLING_CXX_STANDARD}\",
           \"-include\",
-          \"xeus_cling.hh\"
+          \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
         ],
         \"language\": \"C++${XEUSCLING_CXX_STANDARD}\"
       }"
