@@ -14,19 +14,42 @@ on:
 
 jobs:
   kernel-test:
-    name: Testing Kernel Configuration
+    name: Testing Kernel Configuration ${{ matrix.installation }} installation
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project:
-          - adder
+        installation:
+          #- "with"
+          - "without"
 
     steps:
     - name: Checking out xeus-cling-cmake-setup repository
       uses: actions/checkout@v2
 
-    - name: Building the CMake project to test
+    - name: Setting up Anaconda
+      uses: s-weigand/setup-conda@v1
+      channels: 'conda-forge'
+
+    - name : Install test prerequisites
       run: |
-        mkdir build
-        cd build
-        cmake ../test/projects/${{ matrix.project }}
+        python -m pip install -r ./test/requirements.txt
+
+    - name: Install xeus-cling
+      run: |
+        conda install xeus-cling
+
+    - name: Building the kernels and manually install them
+      if: "${{ matrix.installation }}" == "without"
+      run: |
+        cd test
+        ./install_all_kernels.sh
+
+    - name: Building the kernels and installing them with CMake
+      if: "${{ matrix.installation }}" == "with"
+      run: |
+        cd test
+        ./install_all_kernels.sh install
+
+    - name: Run Pytest to check that all Jupyter notebooks can be reproduced
+      run: |
+        py.test --nbval

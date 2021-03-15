@@ -172,14 +172,14 @@ function(xeus_cling_setup)
   # Generate the header file
   file(
     GENERATE
-    OUTPUT xeus_cling.hh
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh
     CONTENT ${xeus_pragma_header}
   )
 
   # Generate the kernel.json file
   file(
     GENERATE
-    OUTPUT kernel.json
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/kernel.json
     CONTENT
       "{
         \"display_name\": \"${XEUSCLING_KERNEL_NAME}\",
@@ -189,7 +189,7 @@ function(xeus_cling_setup)
           \"{connection_file}\",
           \"-std=c++${XEUSCLING_CXX_STANDARD}\",
           \"-include\",
-          \"xeus_cling.hh\"
+          \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
         ],
         \"language\": \"C++${XEUSCLING_CXX_STANDARD}\"
       }"
