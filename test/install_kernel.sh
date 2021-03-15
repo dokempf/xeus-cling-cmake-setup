@@ -11,6 +11,6 @@ then
   cd ..
   rm -rf build-$1
 else
-  jupyter kernelspec install $(pwd) --sys-prefix --name=$1
+  make install_kernelspec
   cd ..
 fi
