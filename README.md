@@ -20,7 +20,7 @@ be installed into your jupyter environment.
 
 * A working installation of xeus-cling. The [currently preferred way is by using anaconda](https://github.com/jupyter-xeus/xeus-cling).
 * Your project needs to build shared libraries (e.g. by setting `BUILD_SHARED_LIBS=ON` in CMake)
-* Your project needs to be able successfully build with Clang 5.
+* Your project needs to be able to successfully build with Clang 5.
 
 ## How to use it in your code.
 
@@ -74,6 +74,11 @@ xeus_cling_setup(
 ```
 
 A detailed description of the parameters can be found at the top of the `XeusClingSetup.cmake` file.
+
+## Limitations
+
+* `cling` itself is limited to working with shared libraries. [They are looking for a volunteer to work on static libraries](https://github.com/root-project/cling/issues/280).
+* We currently do not globally install the kernelspec during installation of the CMake project. In order to implement this, we would need to resolve `INSTALL_INTERFACE` generator expressions in the generation process of `kernel.json` and `xeus_cling.hh`. However, CMake has not yet implemented the necessary bits e.g. see [this issue on file(GENERATE)](https://gitlab.kitware.com/cmake/cmake/-/issues/17984) or [this issue on install(CODE)](https://gitlab.kitware.com/cmake/cmake/-/issues/15785).
 
 ## Licensing
 
