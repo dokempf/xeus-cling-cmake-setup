@@ -7,7 +7,9 @@
 #   [TARGETS target1 [target2 ...]]
 #   [INCLUDE_DIRECTORIES inc1 [inc2 ...]]
 #   [LINK_LIBRARIES lib1 [lib2 ...]]
+#   [LIBRARY_DIRECTORIES dir1 [dir2 ...]]
 #   [COMPILE_FLAGS flag1 [flag2 ...]]
+#   [SETUP_HEADERS header1 [header2 ...]]
 #   [KERNEL_NAME name]
 #   [CXX_STANDARD 11|14|17]
 #   [REQUIRED]
@@ -34,8 +36,17 @@
 #     A list of shared library locations that should be loaded in the xeus-cling session.
 #     May include generator expressions
 #
+# LIBRARY_DIRECTORIES
+#     A list of directories to search for shared libraries.
+#
 # COMPILE_FLAGS
 #     A list of compiler flags to add to the interpreter session.
+#
+# SETUP_HEADERS
+#     A list of C++ headers to include into the kernel setup process. Use this
+#     to hook any C++ start-up code or default includes that you want to apply
+#     into the kernel startup procedure. The file will be included with angle
+#     brackets - it is recommended to pass an absolute path if available.
 #
 # KERNEL_NAME
 #     The display name of the Jupyter Kernel that is to be generated. Defaults to
@@ -77,7 +88,7 @@ function(xeus_cling_setup)
   # Parse Function Arguments
   set(OPTION REQUIRED NO_INSTALL)
   set(SINGLE CXX_STANDARD KERNEL_NAME)
-  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_FLAGS)
+  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_FLAGS LIBRARY_DIRECTORIES SETUP_HEADERS)
   include(CMakeParseArguments)
   cmake_parse_arguments(XEUSCLING "${OPTION}" "${SINGLE}" "${MULTI}" ${ARGN})
   if(XEUSCLING_UNPARSED_ARGUMENTS)
@@ -170,9 +181,19 @@ function(xeus_cling_setup)
     set(xeus_pragma_header "${xeus_pragma_header}$<$<BOOL:${inc}>:#pragma cling add_include_path(\"${inc}\")\n>")
   endforeach()
 
+  # Append all library directories to the pragma header
+  foreach(dir ${XEUSCLING_LIBRARY_DIRECTORIES})
+    set(xeus_pragma_header "${xeus_pragma_header}#pragma cling add_library_path(\"${dir}\")\n")
+  endforeach()
+
   # Append all library loading commands to the pragma header
   foreach(lib ${XEUSCLING_LINK_LIBRARIES})
     set(xeus_pragma_header "${xeus_pragma_header}#pragma cling load(\"${lib}\")\n")
+  endforeach()
+
+  # Append the user-provided start-up headers
+  foreach(header ${XEUSCLING_SETUP_HEADERS})
+    set(xeus_pragma_header "${xeus_pragma_header}#include<${header}>\n")
   endforeach()
 
   # Generate the header file
