@@ -1,5 +1,9 @@
 # xeus-cling-cmake-setup
 
+*DISCLAIMER:* This repository is still in an experimental state. It's core
+functionality is implemented and e.g. used by [this project](https://github.com/dokempf/dune-jupyter-course/blob/master/dune/jupyter-kernel/CMakeLists.txt#L36) but things may still fail in more general
+scenarios. You are welcome to give it a try and report your issues though.
+
 [xeus-cling](https://github.com/jupyter-xeus/xeus-cling) provides an implemenation of a Jupyter Kernel
 for C++ based on the Clang/LLVM C++ interpreter [cling](https://github.com/root-project/cling). Interpreting
 C++ in jupyter has great potential e.g. in rapid prototyping and in teaching.
@@ -69,6 +73,8 @@ xeus_cling_setup(
   [LIBRARY_DIRECTORIES dir1 [dir2 ...]]
   [COMPILE_FLAGS flag1 [flag2 ...]]
   [SETUP_HEADERS header1 [header2 ...]]
+  [DOXYGEN_TAGFILES tagfile1 [tagfile2 ...]]
+  [DOXYGEN_URLS url1 [url2 ...]]
   [KERNEL_NAME name]
   [CXX_STANDARD 11|14|17]
   [REQUIRED]

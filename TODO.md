@@ -1,3 +1,0 @@
-Roadmap:
-
-* Doxygen integration
