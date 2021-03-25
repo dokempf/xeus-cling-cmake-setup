@@ -52,7 +52,8 @@
 #
 # DOXYGEN_URLS
 #     A list of URLs that inline documentation should be embedded from. Only
-#     https:// URLs are supported.
+#     https:// URLs are supported. Note that the web server configuration of
+#     the given URL needs to allow embedding the pages it serves into iframes.
 #
 # DOXYGEN_TAGFILES
 #     The Doxygen tagfiles that describe the documentation. These files can be
