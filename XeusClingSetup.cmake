@@ -159,6 +159,14 @@ function(xeus_cling_setup)
     message(FATAL_ERROR "xeus_cling_setup got passed different length lists for DOXYGEN_TAGFILES and DOXYGEN_URLS")
   endif()
 
+  # Make sure that the given URLs use the https:// protocol
+  foreach(url ${XEUSCLING_DOXYGEN_URLS})
+    string(REGEX MATCH "https://.*" match "${url}")
+    if(NOT "${match}" STREQUAL "${url}")
+      message(FATAL_ERROR "xeus_cling_setup expects https:// URL for Doxygen documentation, got ${url}!")
+    endif()
+  endforeach()
+
   #
   # Collect the data for the generation stage from the given parameters
   #
@@ -292,8 +300,15 @@ function(xeus_cling_setup)
     # Iterate over the given inputs
     math(EXPR bound "${len_urls} - 1")
     foreach(index RANGE ${bound})
+      # Extract the current pair of URL and tagfile - a poor man's zip
       list(GET XEUSCLING_DOXYGEN_URLS ${index} url)
       list(GET XEUSCLING_DOXYGEN_TAGFILES ${index} tag)
+
+      # Make sure that the URL ends with a trailing / - an undocumented requirement of xeus-cling
+      string(REGEX MATCH ".*/" match "${url}")
+      if(NOT "${match}" STREQUAL "${url}")
+        set(url "${url}/")
+      endif()
 
       # Locate the Doxygen tag files - we might need to download it
       if(IS_ABSOLUTE "${tag}")
@@ -325,7 +340,7 @@ function(xeus_cling_setup)
         "
           {
             \"url\": \"${url}\",
-            \"tagfile\": \"${prefix}/${tag}\"
+            \"tagfile\": \"${tag}\"
           }
         "
       )
