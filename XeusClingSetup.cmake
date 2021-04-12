@@ -322,7 +322,7 @@ function(xeus_cling_setup)
           message("-- Attempting to fetch tag file from ${url}/${tag}")
           file(
             DOWNLOAD
-            "${url}/${tag}"
+            "${url}${tag}"
             "${fulltag}"
             STATUS status
           )
