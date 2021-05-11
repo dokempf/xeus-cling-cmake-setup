@@ -72,6 +72,7 @@ xeus_cling_setup(
   [LINK_LIBRARIES lib1 [lib2 ...]]
   [LIBRARY_DIRECTORIES dir1 [dir2 ...]]
   [COMPILE_FLAGS flag1 [flag2 ...]]
+  [COMPILE_DEFINITIONS def1 [def2 ...]]
   [SETUP_HEADERS header1 [header2 ...]]
   [DOXYGEN_TAGFILES tagfile1 [tagfile2 ...]]
   [DOXYGEN_URLS url1 [url2 ...]]
