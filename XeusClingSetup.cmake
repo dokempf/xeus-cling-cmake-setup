@@ -261,9 +261,9 @@ function(xeus_cling_setup)
     CONTENT "${xeus_pragma_include}${xeus_pragma_library_path}${xeus_pragma_load}${xeus_pragma_setup}"
   )
 
-  # Create a string from the given compiler definitions and options
-  set(cxxopts "\"$<$<BOOL:${XEUSCLING_COMPILE_OPTIONS}>:$<JOIN:${XEUSCLING_COMPILE_OPTIONS},\"$<COMMA> \">>\"")
-  set(cxxdef "\"$<$<BOOL:${XEUSCLING_COMPILE_DEFINITIONS}>:-D$<JOIN:${XEUSCLING_COMPILE_DEFINITIONS},\"$<COMMA> \"-D>>\"")
+  # Create a string from the given compiler definitions and options (spaces and new lines are important!)
+  set(cxxopts "\"$<$<BOOL:${XEUSCLING_COMPILE_OPTIONS}>:$<JOIN:${XEUSCLING_COMPILE_OPTIONS},\"$<COMMA>\n    \">>\"")
+  set(cxxdef "\"$<$<BOOL:${XEUSCLING_COMPILE_DEFINITIONS}>:-D$<JOIN:${XEUSCLING_COMPILE_DEFINITIONS},\"$<COMMA>\n    \"-D>>\"")
 
   # Generate the kernel.json file
   file(
@@ -271,20 +271,20 @@ function(xeus_cling_setup)
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/kernel.json
     CONTENT
     "
-      {
-        \"display_name\": \"${XEUSCLING_KERNEL_NAME}\",
-        \"argv\": [
-          \"${XCPP_BIN}\",
-          \"-f\",
-          \"{connection_file}\",
-          \"-std=c++${XEUSCLING_CXX_STANDARD}\",
-          ${cxxopts},
-          ${cxxdef},
-          \"-include\",
-          \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
-        ],
-        \"language\": \"C++${XEUSCLING_CXX_STANDARD}\"
-      }
+{
+  \"display_name\": \"${XEUSCLING_KERNEL_NAME}\",
+  \"argv\": [
+    \"${XCPP_BIN}\",
+    \"-f\",
+    \"{connection_file}\",
+    \"-std=c++${XEUSCLING_CXX_STANDARD}\",
+    ${cxxopts},
+    ${cxxdef},
+    \"-include\",
+    \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
+  ],
+  \"language\": \"C++${XEUSCLING_CXX_STANDARD}\"
+}
     "
   )
 
