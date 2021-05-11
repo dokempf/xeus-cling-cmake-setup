@@ -75,6 +75,7 @@ xeus_cling_setup(
   [SETUP_HEADERS header1 [header2 ...]]
   [DOXYGEN_TAGFILES tagfile1 [tagfile2 ...]]
   [DOXYGEN_URLS url1 [url2 ...]]
+  [KERNEL_LOGO_FILES file1 [file2]]
   [KERNEL_NAME name]
   [CXX_STANDARD 11|14|17]
   [REQUIRED]
