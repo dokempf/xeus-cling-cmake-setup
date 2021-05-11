@@ -12,6 +12,7 @@
 #   [SETUP_HEADERS header1 [header2 ...]]
 #   [DOXYGEN_TAGFILES tagfile1 [tagfile2 ...]]
 #   [DOXYGEN_URLS url1 [url2 ...]]
+#   [KERNEL_LOGO_FILES file1 [file2]]
 #   [KERNEL_NAME name]
 #   [CXX_STANDARD 11|14|17]
 #   [REQUIRED]
@@ -68,6 +69,11 @@
 #         This is the preferred method if you control the server that serves the
 #         Doxygen docs.
 #
+# KERNEL_LOGO_FILES
+#     Image files for this kernel. These are e.g. used in JupyterLab in the kernel
+#     selection menu. File names must be logo-32x32.png or logo-64x64.png and are
+#     expected to be of the respective pixel size.
+#
 # KERNEL_NAME
 #     The display name of the Jupyter Kernel that is to be generated. Defaults to
 #     a readable combination of the C++ standard and the CMake project name of your project.
@@ -108,7 +114,7 @@ function(xeus_cling_setup)
   # Parse Function Arguments
   set(OPTION REQUIRED NO_INSTALL)
   set(SINGLE CXX_STANDARD KERNEL_NAME)
-  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_FLAGS LIBRARY_DIRECTORIES SETUP_HEADERS DOXYGEN_URLS DOXYGEN_TAGFILES)
+  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_FLAGS LIBRARY_DIRECTORIES SETUP_HEADERS DOXYGEN_URLS DOXYGEN_TAGFILES KERNEL_LOGO_FILES)
   include(CMakeParseArguments)
   cmake_parse_arguments(XEUSCLING "${OPTION}" "${SINGLE}" "${MULTI}" ${ARGN})
   if(XEUSCLING_UNPARSED_ARGUMENTS)
@@ -166,6 +172,25 @@ function(xeus_cling_setup)
     if(NOT "${match}" STREQUAL "${url}")
       message(FATAL_ERROR "xeus_cling_setup expects https:// URL for Doxygen documentation, got ${url}!")
     endif()
+  endforeach()
+
+  # Make sure that the given logos have the correct names
+  set(allowed_logo_names logo-32x32.png logo-64x64.png)
+  foreach(filename ${XEUSCLING_KERNEL_LOGO_FILES})
+    get_filename_component(purename "${filename}" NAME)
+    list(FIND allowed_logo_names "${purename}" index)
+    if("${index}" STREQUAL "-1")
+      message(FATAL_ERROR "xeus_cling_setup got passed illegal logo filename.")
+    endif()
+  endforeach()
+
+  # Copy logo files into the build directory to have them be installed by `install_kernelspec`
+  foreach(filename ${XEUSCLING_KERNEL_LOGO_FILES})
+    if(NOT IS_ABSOLUTE "${filename}")
+      set(filename "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
+    endif()
+    get_filename_component(purename "${filename}" NAME)
+    configure_file("${filename}" "${CMAKE_CURRENT_BINARY_DIR}/${purename}" COPYONLY)
   endforeach()
 
   #
