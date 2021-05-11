@@ -9,6 +9,7 @@
 #   [LINK_LIBRARIES lib1 [lib2 ...]]
 #   [LIBRARY_DIRECTORIES dir1 [dir2 ...]]
 #   [COMPILE_FLAGS flag1 [flag2 ...]]
+#   [COMPILE_DEFINITIONS def1 [def2 ...]]
 #   [SETUP_HEADERS header1 [header2 ...]]
 #   [DOXYGEN_TAGFILES tagfile1 [tagfile2 ...]]
 #   [DOXYGEN_URLS url1 [url2 ...]]
@@ -43,6 +44,9 @@
 #
 # COMPILE_FLAGS
 #     A list of compiler flags to add to the interpreter session.
+#
+# COMPILE_DEFINITIONS
+#     A list of preprocessor defines to set for the interpreter session.
 #
 # SETUP_HEADERS
 #     A list of C++ headers to include into the kernel setup process. Use this
@@ -108,7 +112,7 @@ function(xeus_cling_setup)
   # Parse Function Arguments
   set(OPTION REQUIRED NO_INSTALL)
   set(SINGLE CXX_STANDARD KERNEL_NAME)
-  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_FLAGS LIBRARY_DIRECTORIES SETUP_HEADERS DOXYGEN_URLS DOXYGEN_TAGFILES)
+  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_FLAGS LIBRARY_DIRECTORIES SETUP_HEADERS DOXYGEN_URLS DOXYGEN_TAGFILES COMPILE_DEFINITIONS)
   include(CMakeParseArguments)
   cmake_parse_arguments(XEUSCLING "${OPTION}" "${SINGLE}" "${MULTI}" ${ARGN})
   if(XEUSCLING_UNPARSED_ARGUMENTS)
@@ -239,6 +243,10 @@ function(xeus_cling_setup)
   set(cxxopts_string "")
   foreach(flag ${XEUSCLING_COMPILE_FLAGS})
     set(cxxopts_string "${cxxopts_string}\"${flag}\",")
+  endforeach()
+
+  foreach(def ${XEUSCLING_COMPILE_DEFINITIONS})
+    set(cxxopts_string "${cxxopts_string}\"-D${def}\",")
   endforeach()
 
   # Generate the kernel.json file
