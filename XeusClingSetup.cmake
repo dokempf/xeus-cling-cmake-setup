@@ -248,11 +248,11 @@ function(xeus_cling_setup)
   # Create a string from the given compiler options
   set(cxxopts_string "")
   foreach(flag ${XEUSCLING_COMPILE_FLAGS})
-    set(cxxopts_string "${cxxopts_string}\"$<JOIN:${flag},\",\">\",")
+    set(cxxopts_string "${cxxopts_string}$<$<BOOL:${flag}>:\"$<JOIN:${flag},\",\">\",>")
   endforeach()
 
   foreach(def ${XEUSCLING_COMPILE_DEFINITIONS})
-    set(cxxopts_string "${cxxopts_string}\"-D$<JOIN:${def},\",-D\">\",")
+    set(cxxopts_string "${cxxopts_string}$<$<BOOL:${def}>:\"-D$<JOIN:${def},\",-D\">\",>")
   endforeach()
 
   # Generate the kernel.json file
