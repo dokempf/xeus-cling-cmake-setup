@@ -198,8 +198,14 @@ function(xeus_cling_setup)
       endif()
     endif()
 
-    # Append all include directories to the pragma header
-    set(XEUSCLING_INCLUDE_DIRECTORIES "${XEUSCLING_INCLUDE_DIRECTORIES};$<TARGET_PROPERTY:${target},INCLUDE_DIRECTORIES>")
+    # Extract all include directories from the target
+    set(XEUSCLING_INCLUDE_DIRECTORIES "${XEUSCLING_INCLUDE_DIRECTORIES};$<TARGET_PROPERTY:${target},INTERFACE_INCLUDE_DIRECTORIES>")
+
+    # Extract all compile flags from the target
+    set(XEUSCLING_COMPILE_FLAGS "${XEUSCLING_COMPILE_FLAGS};$<TARGET_PROPERTY:${target},INTERFACE_COMPILE_FLAGS>")
+
+    # Extract all compile definitions from the target
+    set(XEUSCLING_COMPILE_DEFINITIONS "${XEUSCLING_COMPILE_DEFINITIONS};$<TARGET_PROPERTY:${target},INTERFACE_COMPILE_DEFINITIONS>")
 
     # Append the library file to the pragma header
     set(XEUSCLING_LINK_LIBRARIES ${XEUSCLING_LINK_LIBRARIES} "$<TARGET_FILE:${target}>")
@@ -242,11 +248,11 @@ function(xeus_cling_setup)
   # Create a string from the given compiler options
   set(cxxopts_string "")
   foreach(flag ${XEUSCLING_COMPILE_FLAGS})
-    set(cxxopts_string "${cxxopts_string}\"${flag}\",")
+    set(cxxopts_string "${cxxopts_string}\"$<JOIN:${flag},\",\">\",")
   endforeach()
 
   foreach(def ${XEUSCLING_COMPILE_DEFINITIONS})
-    set(cxxopts_string "${cxxopts_string}\"-D${def}\",")
+    set(cxxopts_string "${cxxopts_string}\"-D$<JOIN:${def},\",-D\">\",")
   endforeach()
 
   # Generate the kernel.json file
