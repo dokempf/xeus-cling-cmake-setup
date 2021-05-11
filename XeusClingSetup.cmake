@@ -195,10 +195,7 @@ function(xeus_cling_setup)
     endif()
 
     # Append all include directories to the pragma header
-    get_target_property(incs ${target} INCLUDE_DIRECTORIES)
-    foreach(inc ${incs})
-      set(XEUSCLING_INCLUDE_DIRECTORIES ${XEUSCLING_INCLUDE_DIRECTORIES} ${inc})
-    endforeach()
+    set(XEUSCLING_INCLUDE_DIRECTORIES "${XEUSCLING_INCLUDE_DIRECTORIES};$<TARGET_PROPERTY:${target},INCLUDE_DIRECTORIES>")
 
     # Append the library file to the pragma header
     set(XEUSCLING_LINK_LIBRARIES ${XEUSCLING_LINK_LIBRARIES} "$<TARGET_FILE:${target}>")
@@ -213,7 +210,7 @@ function(xeus_cling_setup)
 
   # Append all include directories to the pragma header
   foreach(inc ${XEUSCLING_INCLUDE_DIRECTORIES})
-    set(xeus_pragma_header "${xeus_pragma_header}$<$<BOOL:${inc}>:#pragma cling add_include_path(\"${inc}\")\n>")
+    set(xeus_pragma_header "${xeus_pragma_header}$<$<BOOL:${inc}>:#pragma cling add_include_path(\"$<JOIN:${inc},\")\n#pragma cling add_include_path(\">\")\n>")
   endforeach()
 
   # Append all library directories to the pragma header
