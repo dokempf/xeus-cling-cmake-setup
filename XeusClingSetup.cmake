@@ -175,7 +175,7 @@ function(xeus_cling_setup)
   endforeach()
 
   # Make sure that the given logos have the correct names
-  list(allowed_logo_names logo-32x32.png logo-64x64.png)
+  set(allowed_logo_names logo-32x32.png logo-64x64.png)
   foreach(filename ${XEUSCLING_KERNEL_LOGO_FILES})
     get_filename_component(purename "${filename}" NAME)
     list(FIND allowed_logo_names "${purename}" index)
