@@ -229,6 +229,10 @@ function(xeus_cling_setup)
     # Append the library object file to the pragma header
     list(APPEND XEUSCLING_LINK_LIBRARIES "$<TARGET_FILE:${target}>")
 
+    # Append paths of list of public link directories requirements for the target
+    list(APPEND XEUSCLING_LIBRARY_DIRECTORIES "$<TARGET_PROPERTY:${target},INTERFACE_LINK_DIRECTORIES>")
+    list(APPEND XEUSCLING_LIBRARY_DIRECTORIES "$<TARGET_LINKER_FILE_DIR:${target}>")
+
     # Extract all compile flags from the target
     list(APPEND XEUSCLING_COMPILE_OPTIONS "$<TARGET_PROPERTY:${target},INTEFACE_COMPILE_OPTIONS>")
 
