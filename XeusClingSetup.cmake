@@ -234,7 +234,7 @@ function(xeus_cling_setup)
     list(APPEND XEUSCLING_LIBRARY_DIRECTORIES "$<TARGET_LINKER_FILE_DIR:${target}>")
 
     # Extract all compile flags from the target
-    list(APPEND XEUSCLING_COMPILE_OPTIONS "$<TARGET_PROPERTY:${target},INTEFACE_COMPILE_OPTIONS>")
+    list(APPEND XEUSCLING_COMPILE_OPTIONS "$<TARGET_PROPERTY:${target},INTERFACE_COMPILE_OPTIONS>")
 
     # Extract all compile definitions from the target
     list(APPEND XEUSCLING_COMPILE_DEFINITIONS "$<TARGET_PROPERTY:${target},INTERFACE_COMPILE_DEFINITIONS>")
