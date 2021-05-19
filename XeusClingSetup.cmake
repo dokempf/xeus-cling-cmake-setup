@@ -8,7 +8,7 @@
 #   [INCLUDE_DIRECTORIES inc1 [inc2 ...]]
 #   [LINK_LIBRARIES lib1 [lib2 ...]]
 #   [LIBRARY_DIRECTORIES dir1 [dir2 ...]]
-#   [COMPILE_FLAGS flag1 [flag2 ...]]
+#   [COMPILE_OPTIONS flag1 [flag2 ...]]
 #   [COMPILE_DEFINITIONS def1 [def2 ...]]
 #   [SETUP_HEADERS header1 [header2 ...]]
 #   [DOXYGEN_TAGFILES tagfile1 [tagfile2 ...]]
@@ -43,8 +43,8 @@
 # LIBRARY_DIRECTORIES
 #     A list of directories to search for shared libraries.
 #
-# COMPILE_FLAGS
-#     A list of compiler flags to add to the interpreter session.
+# COMPILE_OPTIONS
+#     A list of compiler options to add to the interpreter session.
 #
 # COMPILE_DEFINITIONS
 #     A list of preprocessor defines to set for the interpreter session.
@@ -118,7 +118,7 @@ function(xeus_cling_setup)
   # Parse Function Arguments
   set(OPTION REQUIRED NO_INSTALL)
   set(SINGLE CXX_STANDARD KERNEL_NAME)
-  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_FLAGS COMPILE_DEFINITIONS LIBRARY_DIRECTORIES SETUP_HEADERS DOXYGEN_URLS DOXYGEN_TAGFILES KERNEL_LOGO_FILES)
+  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_OPTIONS COMPILE_DEFINITIONS LIBRARY_DIRECTORIES SETUP_HEADERS DOXYGEN_URLS DOXYGEN_TAGFILES KERNEL_LOGO_FILES)
   include(CMakeParseArguments)
   cmake_parse_arguments(XEUSCLING "${OPTION}" "${SINGLE}" "${MULTI}" ${ARGN})
   if(XEUSCLING_UNPARSED_ARGUMENTS)
