@@ -197,6 +197,10 @@ function(xeus_cling_setup)
     configure_file("${filename}" "${CMAKE_CURRENT_BINARY_DIR}/${purename}" COPYONLY)
   endforeach()
 
+  # Add a subdirectory for the kernelspec - this prevents that a lot of unnecessary
+  # files are installed into the Jupyter environment
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/kernelspec)
+
   #
   # Collect the data for the generation stage from the given parameters
   #
@@ -272,7 +276,7 @@ function(xeus_cling_setup)
   # Generate the kernel.json file
   file(
     GENERATE
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/kernel.json
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/kernelspec/kernel.json
     CONTENT
     "
     {
@@ -304,7 +308,7 @@ function(xeus_cling_setup)
   if(JUPYTER_BIN)
     add_custom_target(
       install_kernelspec
-      COMMAND ${JUPYTER_BIN} kernelspec install ${CMAKE_CURRENT_BINARY_DIR} --sys-prefix --name=${kernel_name}
+      COMMAND ${JUPYTER_BIN} kernelspec install ${CMAKE_CURRENT_BINARY_DIR}/kernelspec --sys-prefix --name=${kernel_name}
       COMMENT "Install kernelspec into the jupyter environment..."
     )
   else()
