@@ -8,7 +8,8 @@
 #   [INCLUDE_DIRECTORIES inc1 [inc2 ...]]
 #   [LINK_LIBRARIES lib1 [lib2 ...]]
 #   [LIBRARY_DIRECTORIES dir1 [dir2 ...]]
-#   [COMPILE_FLAGS flag1 [flag2 ...]]
+#   [COMPILE_OPTIONS flag1 [flag2 ...]]
+#   [COMPILE_DEFINITIONS def1 [def2 ...]]
 #   [SETUP_HEADERS header1 [header2 ...]]
 #   [DOXYGEN_TAGFILES tagfile1 [tagfile2 ...]]
 #   [DOXYGEN_URLS url1 [url2 ...]]
@@ -42,8 +43,11 @@
 # LIBRARY_DIRECTORIES
 #     A list of directories to search for shared libraries.
 #
-# COMPILE_FLAGS
-#     A list of compiler flags to add to the interpreter session.
+# COMPILE_OPTIONS
+#     A list of compiler options to add to the interpreter session.
+#
+# COMPILE_DEFINITIONS
+#     A list of preprocessor defines to set for the interpreter session.
 #
 # SETUP_HEADERS
 #     A list of C++ headers to include into the kernel setup process. Use this
@@ -114,7 +118,7 @@ function(xeus_cling_setup)
   # Parse Function Arguments
   set(OPTION REQUIRED NO_INSTALL)
   set(SINGLE CXX_STANDARD KERNEL_NAME)
-  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_FLAGS LIBRARY_DIRECTORIES SETUP_HEADERS DOXYGEN_URLS DOXYGEN_TAGFILES KERNEL_LOGO_FILES)
+  set(MULTI TARGETS INCLUDE_DIRECTORIES LINK_LIBRARIES COMPILE_OPTIONS COMPILE_DEFINITIONS LIBRARY_DIRECTORIES SETUP_HEADERS DOXYGEN_URLS DOXYGEN_TAGFILES KERNEL_LOGO_FILES)
   include(CMakeParseArguments)
   cmake_parse_arguments(XEUSCLING "${OPTION}" "${SINGLE}" "${MULTI}" ${ARGN})
   if(XEUSCLING_UNPARSED_ARGUMENTS)
@@ -219,55 +223,51 @@ function(xeus_cling_setup)
       endif()
     endif()
 
-    # Append all include directories to the pragma header
-    get_target_property(incs ${target} INCLUDE_DIRECTORIES)
-    foreach(inc ${incs})
-      set(XEUSCLING_INCLUDE_DIRECTORIES ${XEUSCLING_INCLUDE_DIRECTORIES} ${inc})
-    endforeach()
+    # Extract all include directories from the target
+    list(APPEND XEUSCLING_INCLUDE_DIRECTORIES "$<TARGET_PROPERTY:${target},INTERFACE_INCLUDE_DIRECTORIES>")
 
-    # Append the library file to the pragma header
-    set(XEUSCLING_LINK_LIBRARIES ${XEUSCLING_LINK_LIBRARIES} "$<TARGET_FILE:${target}>")
+    # Append the library object file to the pragma header
+    list(APPEND XEUSCLING_LINK_LIBRARIES "$<TARGET_FILE:${target}>")
+
+    # Append paths of list of public link directories requirements for the target
+    list(APPEND XEUSCLING_LIBRARY_DIRECTORIES "$<TARGET_PROPERTY:${target},INTERFACE_LINK_DIRECTORIES>")
+    list(APPEND XEUSCLING_LIBRARY_DIRECTORIES "$<TARGET_LINKER_FILE_DIR:${target}>")
+
+    # Extract all compile flags from the target
+    list(APPEND XEUSCLING_COMPILE_OPTIONS "$<TARGET_PROPERTY:${target},INTERFACE_COMPILE_OPTIONS>")
+
+    # Extract all compile definitions from the target
+    list(APPEND XEUSCLING_COMPILE_DEFINITIONS "$<TARGET_PROPERTY:${target},INTERFACE_COMPILE_DEFINITIONS>")
   endforeach()
 
   #
   # Generate the kernel configuration
   #
 
-  # Incrementally build the pragma header
-  set(xeus_pragma_header "")
-
   # Append all include directories to the pragma header
-  foreach(inc ${XEUSCLING_INCLUDE_DIRECTORIES})
-    set(xeus_pragma_header "${xeus_pragma_header}$<$<BOOL:${inc}>:#pragma cling add_include_path(\"${inc}\")\n>")
-  endforeach()
+  set(xeus_pragma_include "$<$<BOOL:${XEUSCLING_INCLUDE_DIRECTORIES}>:#pragma cling add_include_path(\"$<JOIN:${XEUSCLING_INCLUDE_DIRECTORIES},\")\n#pragma cling add_include_path(\">\")\n>")
 
   # Append all library directories to the pragma header
-  foreach(dir ${XEUSCLING_LIBRARY_DIRECTORIES})
-    set(xeus_pragma_header "${xeus_pragma_header}#pragma cling add_library_path(\"${dir}\")\n")
-  endforeach()
+  set(xeus_pragma_library_path "$<$<BOOL:${XEUSCLING_LIBRARY_DIRECTORIES}>:#pragma cling add_library_path(\"$<JOIN:${XEUSCLING_LIBRARY_DIRECTORIES},\")\n#pragma cling add_library_path(\">\")\n>")
 
   # Append all library loading commands to the pragma header
-  foreach(lib ${XEUSCLING_LINK_LIBRARIES})
-    set(xeus_pragma_header "${xeus_pragma_header}#pragma cling load(\"${lib}\")\n")
-  endforeach()
+  set(xeus_pragma_load "$<$<BOOL:${XEUSCLING_LINK_LIBRARIES}>:#pragma cling load(\"$<JOIN:${XEUSCLING_LINK_LIBRARIES},\")\n#pragma cling load(\">\")\n>")
 
   # Append the user-provided start-up headers
   foreach(header ${XEUSCLING_SETUP_HEADERS})
-    set(xeus_pragma_header "${xeus_pragma_header}#include<${header}>\n")
+    set(xeus_pragma_setup "#include<${header}>\n")
   endforeach()
 
   # Generate the header file
   file(
     GENERATE
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh"
-    CONTENT ${xeus_pragma_header}
+    CONTENT "${xeus_pragma_include}${xeus_pragma_library_path}${xeus_pragma_load}${xeus_pragma_setup}"
   )
 
-  # Create a string from the given compiler options
-  set(cxxopts_string "")
-  foreach(flag ${XEUSCLING_COMPILE_FLAGS})
-    set(cxxopts_string "${cxxopts_string}\"${flag}\",")
-  endforeach()
+  # Create a string from the given compiler definitions and options
+  set(cxxopts "\"$<$<BOOL:${XEUSCLING_COMPILE_OPTIONS}>:$<JOIN:${XEUSCLING_COMPILE_OPTIONS},\"$<COMMA>\n\">>\"")
+  set(cxxdef "\"$<$<BOOL:${XEUSCLING_COMPILE_DEFINITIONS}>:-D$<JOIN:${XEUSCLING_COMPILE_DEFINITIONS},\"$<COMMA>\n\"-D>>\"")
 
   # Generate the kernel.json file
   file(
@@ -275,19 +275,20 @@ function(xeus_cling_setup)
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/kernel.json
     CONTENT
     "
-      {
-        \"display_name\": \"${XEUSCLING_KERNEL_NAME}\",
-        \"argv\": [
-          \"${XCPP_BIN}\",
-          \"-f\",
-          \"{connection_file}\",
-          \"-std=c++${XEUSCLING_CXX_STANDARD}\",
-          ${cxxopts_string}
-          \"-include\",
-          \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
-        ],
-        \"language\": \"C++${XEUSCLING_CXX_STANDARD}\"
-      }
+    {
+      \"display_name\": \"${XEUSCLING_KERNEL_NAME}\",
+      \"argv\": [
+        \"${XCPP_BIN}\",
+        \"-f\",
+        \"{connection_file}\",
+        \"-std=c++${XEUSCLING_CXX_STANDARD}\",
+        ${cxxopts},
+        ${cxxdef},
+        \"-include\",
+        \"${CMAKE_CURRENT_BINARY_DIR}/xeus_cling.hh\"
+      ],
+      \"language\": \"C++${XEUSCLING_CXX_STANDARD}\"
+    }
     "
   )
 
