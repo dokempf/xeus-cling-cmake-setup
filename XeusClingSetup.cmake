@@ -345,14 +345,21 @@ function(xeus_cling_setup)
       if(IS_ABSOLUTE "${tag}")
         set(fulltag "${tag}")
       else()
+        # Check for a potentially existing tag file in the source
         if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${tag})
           set(fulltag "${CMAKE_CURRENT_SOURCE_DIR}/${tag}")
         else()
+          # We download tag files into the build directory
           set(fulltag "${CMAKE_CURRENT_BINARY_DIR}/${tag}")
-          message("-- Attempting to fetch tag file from ${url}/${tag}")
+
+          # Deal with spaces in tag names
+          string(REPLACE " " "%20" webtag "${tag}")
+
+          # Do the actual download
+          message("-- Attempting to fetch tag file from ${url}/${webtag}")
           file(
             DOWNLOAD
-            "${url}${tag}"
+            "${url}${webtag}"
             "${fulltag}"
             STATUS status
           )
