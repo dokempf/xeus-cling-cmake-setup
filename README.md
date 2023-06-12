@@ -59,7 +59,8 @@ be specified manually (see below for the full signature of `xeus_cling_setup`).
 
 A `kernel.json` file will be generated into your build directory. You can install
 this kernel specification by building the CMake target `install_kernelspec` or you
-can manually do so using the `jupyter kernelspec install` command.
+can manually do so using the `jupyter kernelspec install` command. Note that in either
+case, the Conda environment where `xeus-cling` is installed needs to be activated first.
 
 ## Documentation
 
